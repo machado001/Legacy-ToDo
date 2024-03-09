@@ -30,39 +30,28 @@ public class MainActivity extends AppCompatActivity {
             list.add(new ItemModel("title","description"));
 
             if (listener.getItemId() == R.id.item_done) {
-
-                Fragment fragment = MainFragment.newInstance("DONE");
-               getSupportFragmentManager()
-                       .beginTransaction()
-                       .setReorderingAllowed(true)
-                       .replace(R.id.main_frag,fragment)
-                       .commit();
-
-                Toast.makeText(this,"DONE ITEM",Toast.LENGTH_LONG).show();
+               doTransaction("DONE", "DONE ITEM");
             }
 
             if (listener.getItemId() == R.id.item_progress) {
-
-                MainFragment fragment = MainFragment.newInstance("PROGRESS");
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .setReorderingAllowed(true)
-                        .replace(R.id.main_frag,fragment)
-                        .commit();
-                Toast.makeText(this,"IN PROGRESS ITEM",Toast.LENGTH_LONG).show();
+                doTransaction("PROGRESS", "IN PROGRESS ITEM");
             }
 
             if (listener.getItemId() == R.id.item_pending) {
-
-                MainFragment fragment = MainFragment.newInstance("PENDING");
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .setReorderingAllowed(true)
-                        .replace(R.id.main_frag,fragment)
-                        .commit();
-                Toast.makeText(this,"PENDING ITEM",Toast.LENGTH_LONG).show();
+                doTransaction("PENDING", "PENDING ITEM");
             }
             return true;
         });
     }
+
+    private void doTransaction(String title, String toast) {
+        MainFragment fragment = MainFragment.newInstance(title);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .setReorderingAllowed(true)
+                .replace(R.id.main_frag, fragment)
+                .commit();
+        Toast.makeText(this, toast, Toast.LENGTH_LONG).show();
+    }
+
 }

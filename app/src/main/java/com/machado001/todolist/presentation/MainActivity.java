@@ -1,50 +1,46 @@
 package com.machado001.todolist.presentation;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
 import com.machado001.todolist.R;
 import com.machado001.todolist.databinding.ActivityMainBinding;
-import com.machado001.todolist.domain.ItemModel;
+import com.machado001.todolist.presentation.strategy.DoneStrategy;
+import com.machado001.todolist.presentation.strategy.NavigationItemStrategy;
+import com.machado001.todolist.presentation.strategy.PendingStrategy;
+import com.machado001.todolist.presentation.strategy.ProgressStrategy;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-
+    private final Map<Integer, NavigationItemStrategy> strategyMap = new HashMap<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
-        View view = binding.getRoot();
-        setContentView(view);
+        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        binding.mainBottomNav.setOnItemSelectedListener( listener -> {
+        setupStrategies();
 
-            ArrayList<ItemModel> list = new ArrayList<>();
-
-            list.add(new ItemModel("title","description"));
-            list.add(new ItemModel("title","description"));
-
-            if (listener.getItemId() == R.id.item_done) {
-               doTransaction("DONE", "DONE ITEM");
-            }
-
-            if (listener.getItemId() == R.id.item_progress) {
-                doTransaction("PROGRESS", "IN PROGRESS ITEM");
-            }
-
-            if (listener.getItemId() == R.id.item_pending) {
-                doTransaction("PENDING", "PENDING ITEM");
+        binding.mainBottomNav.setOnItemSelectedListener(item -> {
+            NavigationItemStrategy strategy = strategyMap.get(item.getItemId());
+            if (strategy != null) {
+                strategy.execute();
             }
             return true;
         });
     }
 
-    private void doTransaction(String title, String toast) {
+    private void setupStrategies() {
+        strategyMap.put(R.id.item_progress, new ProgressStrategy(this));
+        strategyMap.put(R.id.item_pending, new PendingStrategy(this));
+        strategyMap.put(R.id.item_done, new DoneStrategy(this));
+    }
+
+    public void doTransaction(String title, String toast) {
         MainFragment fragment = MainFragment.newInstance(title);
         getSupportFragmentManager()
                 .beginTransaction()
@@ -53,5 +49,4 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
         Toast.makeText(this, toast, Toast.LENGTH_LONG).show();
     }
-
 }
